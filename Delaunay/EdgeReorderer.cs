@@ -3,33 +3,29 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace csDelaunay {
-
 	public class EdgeReorderer {
-
-		private List<Edge> edges;
-		private List<LR> edgeOrientations;
-
-		public List<Edge> Edges {get{return edges;}}
-		public List<LR> EdgeOrientations {get{return edgeOrientations;}}
+		// Properties.
+		public List<Edge> Edges { get; private set; }
+		public List<LR> EdgeOrientations { get; private set; }
 
 		public EdgeReorderer(List<Edge> origEdges, Type criterion) {
-			edges = new List<Edge>();
-			edgeOrientations = new List<LR>();
+			this.Edges = new List<Edge>();
+			this.EdgeOrientations = new List<LR>();
 			if (origEdges.Count > 0) {
-				edges = ReorderEdges(origEdges, criterion);
+				this.Edges = ReorderEdges(origEdges, criterion);
 			}
 		}
 
 		public void Dispose() {
-			edges = null;
-			edgeOrientations = null;
+			this.Edges = null;
+			this.EdgeOrientations = null;
 		}
 
 		private List<Edge> ReorderEdges(List<Edge> origEdges, Type criterion) {
 			int i;
 			int n = origEdges.Count;
 			Edge edge;
-			// We're going to reorder the edges in order of traversal
+			// We're going to reorder the edges in order of traversal.
 			List<bool> done = new List<bool>();
 			int nDone = 0;
 			for (int b = 0; b < n; b++) done.Add(false);
@@ -38,8 +34,8 @@ namespace csDelaunay {
 			i = 0;
 			edge = origEdges[i];
 			newEdges.Add(edge);
-			edgeOrientations.Add(LR.LEFT);
-			ICoord firstPoint; 
+			this.EdgeOrientations.Add(LR.LEFT);
+			ICoord firstPoint;
 			ICoord lastPoint;
 			if (criterion == typeof(Vertex)) {
 				firstPoint = edge.LeftVertex;
@@ -62,7 +58,7 @@ namespace csDelaunay {
 						continue;
 					}
 					edge = origEdges[i];
-					ICoord leftPoint; 
+					ICoord leftPoint;
 					ICoord rightPoint;
 					if (criterion == typeof(Vertex)) {
 						leftPoint = edge.LeftVertex;
@@ -76,22 +72,22 @@ namespace csDelaunay {
 					}
 					if (leftPoint == lastPoint) {
 						lastPoint = rightPoint;
-						edgeOrientations.Add(LR.LEFT);
+						this.EdgeOrientations.Add(LR.LEFT);
 						newEdges.Add(edge);
 						done[i] = true;
 					} else if (rightPoint == firstPoint) {
 						firstPoint = leftPoint;
-						edgeOrientations.Insert(0, LR.LEFT);
+						this.EdgeOrientations.Insert(0, LR.LEFT);
 						newEdges.Insert(0, edge);
 						done[i] = true;
 					} else if (leftPoint == firstPoint) {
 						firstPoint = rightPoint;
-						edgeOrientations.Insert(0, LR.RIGHT);
+						this.EdgeOrientations.Insert(0, LR.RIGHT);
 						newEdges.Insert(0, edge);
 						done[i] = true;
 					} else if (rightPoint == lastPoint) {
 						lastPoint = leftPoint;
-						edgeOrientations.Add(LR.RIGHT);
+						this.EdgeOrientations.Add(LR.RIGHT);
 						newEdges.Add(edge);
 						done[i] = true;
 					}

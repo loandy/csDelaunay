@@ -1,7 +1,5 @@
 ﻿namespace csDelaunay {
-	
 	public class LR {
-
 		public static readonly LR LEFT = new LR("left");
 		public static readonly LR RIGHT = new LR("right");
 
@@ -12,7 +10,7 @@
 		}
 
 		public static LR Other(LR leftRight) {
-			return leftRight == LEFT ? RIGHT : LEFT;
+			return leftRight == LR.LEFT ? LR.RIGHT : LR.LEFT;
 		}
 
 		public override string ToString() {

@@ -2,50 +2,34 @@
 using System.Collections.Generic;
 
 namespace csDelaunay {
-
 	public class EdgeList {
-
+		// Attributes.
 		private float deltaX;
 		private float xmin;
-
 		private int hashSize;
 		private Halfedge[] hash;
-		private Halfedge leftEnd;
-		public Halfedge LeftEnd {get{return leftEnd;}}
-		private Halfedge rightEnd;
-		public Halfedge RightEnd {get{return rightEnd;}}
 
-		public void Dispose() {
-			Halfedge halfedge = leftEnd;
-			Halfedge prevHe;
-			while (halfedge != rightEnd) {
-				prevHe = halfedge;
-				halfedge = halfedge.edgeListRightNeighbor;
-				prevHe.Dispose();
-			}
-			leftEnd = null;
-			rightEnd.Dispose();
-			rightEnd = null;
+		// Properties.
+		public Halfedge LeftEnd { get; private set; }
+		public Halfedge RightEnd { get; private set; }
 
-			hash = null;
-		}
-
+		// Methods.
 		public EdgeList(float xmin, float deltaX, int sqrtSitesNb) {
 			this.xmin = xmin;
 			this.deltaX = deltaX;
-			hashSize = 2 * sqrtSitesNb;
+			this.hashSize = 2 * sqrtSitesNb;
 
-			hash = new Halfedge[hashSize];
+			this.hash = new Halfedge[this.hashSize];
 
 			// Two dummy Halfedges:
-			leftEnd = Halfedge.CreateDummy();
-			rightEnd = Halfedge.CreateDummy();
-			leftEnd.edgeListLeftNeighbor = null;
-			leftEnd.edgeListRightNeighbor = rightEnd;
-			rightEnd.edgeListLeftNeighbor = leftEnd;
-			rightEnd.edgeListRightNeighbor = null;
-			hash[0] = leftEnd;
-			hash[hashSize - 1] = rightEnd;
+			this.LeftEnd = Halfedge.CreateDummy();
+			this.RightEnd = Halfedge.CreateDummy();
+			this.LeftEnd.EdgeListLeftNeighbor = null;
+			this.LeftEnd.EdgeListRightNeighbor = this.RightEnd;
+			this.RightEnd.EdgeListLeftNeighbor = this.LeftEnd;
+			this.RightEnd.EdgeListRightNeighbor = null;
+			this.hash[0] = this.LeftEnd;
+			this.hash[hashSize - 1] = this.RightEnd;
 		}
 
 		/*
@@ -54,10 +38,10 @@ namespace csDelaunay {
 		 * @param newHalfedge
 		 */
 		public void Insert(Halfedge lb, Halfedge newHalfedge) {
-			newHalfedge.edgeListLeftNeighbor = lb;
-			newHalfedge.edgeListRightNeighbor = lb.edgeListRightNeighbor;
-			lb.edgeListRightNeighbor.edgeListLeftNeighbor = newHalfedge;
-			lb.edgeListRightNeighbor = newHalfedge;
+			newHalfedge.EdgeListLeftNeighbor = lb;
+			newHalfedge.EdgeListRightNeighbor = lb.EdgeListRightNeighbor;
+			lb.EdgeListRightNeighbor.EdgeListLeftNeighbor = newHalfedge;
+			lb.EdgeListRightNeighbor = newHalfedge;
 		}
 
 		/*
@@ -66,10 +50,25 @@ namespace csDelaunay {
 		 * @param halfEdge
 		 */
 		public void Remove(Halfedge halfedge) {
-			halfedge.edgeListLeftNeighbor.edgeListRightNeighbor = halfedge.edgeListRightNeighbor;
-			halfedge.edgeListRightNeighbor.edgeListLeftNeighbor = halfedge.edgeListLeftNeighbor;
-			halfedge.edge = Edge.DELETED;
-			halfedge.edgeListLeftNeighbor = halfedge.edgeListRightNeighbor = null;
+			halfedge.EdgeListLeftNeighbor.EdgeListRightNeighbor = halfedge.EdgeListRightNeighbor;
+			halfedge.EdgeListRightNeighbor.EdgeListLeftNeighbor = halfedge.EdgeListLeftNeighbor;
+			halfedge.Edge = Edge.DELETED;
+			halfedge.EdgeListLeftNeighbor = halfedge.EdgeListRightNeighbor = null;
+		}
+
+		public void Dispose() {
+			Halfedge halfedge = this.LeftEnd;
+			Halfedge prevHe;
+			while (halfedge != this.RightEnd) {
+				prevHe = halfedge;
+				halfedge = halfedge.EdgeListRightNeighbor;
+				prevHe.Dispose();
+			}
+			this.LeftEnd = null;
+			this.RightEnd.Dispose();
+			this.RightEnd = null;
+
+			this.hash = null;
 		}
 
 		/*
@@ -82,37 +81,41 @@ namespace csDelaunay {
 			Halfedge halfedge;
 
 			// Use hash table to get close to desired halfedge
-			bucket = (int)((p.x - xmin)/deltaX * hashSize);
+			bucket = (int)((p.x - xmin) / deltaX * hashSize);
 			if (bucket < 0) {
 				bucket = 0;
 			}
-			if (bucket >= hashSize) {
-				bucket = hashSize - 1;
+			if (bucket >= this.hashSize) {
+				bucket = this.hashSize - 1;
 			}
-			halfedge = GetHash(bucket);
+			halfedge = this.GetHash(bucket);
 			if (halfedge == null) {
 				for (int i = 0; true; i++) {
-					if ((halfedge = GetHash(bucket - i)) != null) break;
-					if ((halfedge = GetHash(bucket + i)) != null) break;
+					if ((halfedge = this.GetHash(bucket - i)) != null) {
+						break;
+					}
+					if ((halfedge = this.GetHash(bucket + i)) != null) {
+						break;
+					}
 				}
 			}
 			// Now search linear list of haledges for the correct one
-			if (halfedge == leftEnd || (halfedge != rightEnd && halfedge.IsLeftOf(p))) {
+			if (halfedge == this.LeftEnd || (halfedge != this.RightEnd && halfedge.IsLeftOf(p))) {
 				do {
-					halfedge = halfedge.edgeListRightNeighbor;
-				} while (halfedge != rightEnd && halfedge.IsLeftOf(p));
-				halfedge = halfedge.edgeListLeftNeighbor;
-
+					halfedge = halfedge.EdgeListRightNeighbor;
+				} while (halfedge != this.RightEnd && halfedge.IsLeftOf(p));
+				halfedge = halfedge.EdgeListLeftNeighbor;
 			} else {
 				do {
-					halfedge = halfedge.edgeListLeftNeighbor;
-				} while (halfedge != leftEnd && !halfedge.IsLeftOf(p));
+					halfedge = halfedge.EdgeListLeftNeighbor;
+				} while (halfedge != this.LeftEnd && !halfedge.IsLeftOf(p));
 			}
 
 			// Update hash table and reference counts
-			if (bucket > 0 && bucket < hashSize - 1) {
-				hash[bucket] = halfedge;
+			if (bucket > 0 && bucket < this.hashSize - 1) {
+				this.hash[bucket] = halfedge;
 			}
+
 			return halfedge;
 		}
 
@@ -120,13 +123,14 @@ namespace csDelaunay {
 		private Halfedge GetHash(int b) {
 			Halfedge halfedge;
 
-			if (b < 0 || b >= hashSize) {
+			if (b < 0 || b >= this.hashSize) {
 				return null;
 			}
-			halfedge = hash[b];
-			if (halfedge != null && halfedge.edge == Edge.DELETED) {
-				// Hash table points to deleted halfedge. Patch as necessary
-				hash[b] = null;
+
+			halfedge = this.hash[b];
+			if (halfedge != null && halfedge.Edge == Edge.DELETED) {
+				// Hash table points to deleted halfedge. Patch as necessary.
+				this.hash[b] = null;
 				// Still can't dispose halfedge yet!
 				return null;
 			} else {

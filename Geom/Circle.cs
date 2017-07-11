@@ -2,17 +2,18 @@
 
 namespace csDelaunay {
 	public class Circle {
+		// Properties.
+		public Vector2f Center { get; set; }
+		public float Radius { get; set; }
 
-		public Vector2f center;
-		public float radius;
-
+		// Methods.
 		public Circle(float centerX, float centerY, float radius) {
-			this.center = new Vector2f(centerX, centerY);
-			this.radius = radius;
+			this.Center = new Vector2f(centerX, centerY);
+			this.Radius = radius;
 		}
 
-		public override string ToString () {
-			return "Circle (center: " + center + "; radius: " + radius + ")";
+		public override string ToString() {
+			return "Circle (center: " + this.Center + "; radius: " + this.Radius + ")";
 		}
 	}
 }

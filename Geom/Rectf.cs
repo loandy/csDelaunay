@@ -1,52 +1,56 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 
-public struct Rectf {
-	
-	public static readonly Rectf zero = new Rectf(0,0,0,0);
-	public static readonly Rectf one = new Rectf(1,1,1,1);
+namespace csDelaunay {
+	public struct Rectf {
+		// Attributes.
+		public static readonly Rectf ZERO = new Rectf(0,0,0,0);
+		public static readonly Rectf ONE = new Rectf(1,1,1,1);
 
-	public float x,y,width,height;
+		// Properties.
+		public float X { get; set; }
+		public float Y { get; set; }
+		public float Width { get; set; }
+		public float Height { get; set; }
 
-	public Rectf(float x, float y, float width, float height) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-	}
-
-	public float left {
-		get {
-			return x;}
-	}
-
-	public float right {
-		get {
-			return x+width;
+		public float Left {
+			get {
+				return this.X;
+			}
 		}
-	}
-
-	public float top {
-		get {
-			return y;
+		public float Right {
+			get {
+				return this.X + this.Width;
+			}
 		}
-	}
-	
-	public float bottom {
-		get {
-			return y+height;
+		public float Top {
+			get {
+				return this.Y;
+			}
 		}
-	}
-
-	public Vector2f topLeft {
-		get {
-			return new Vector2f(left, top);
+		public float Bottom {
+			get {
+				return this.Y + this.Height;
+			}
 		}
-	}
 
-	public Vector2f bottomRight {
-		get {
-			return new Vector2f(right, bottom);
+		public Vector2f TopLeft {
+			get {
+				return new Vector2f(this.Left, this.Top);
+			}
+		}
+
+		public Vector2f BottomRight {
+			get {
+				return new Vector2f(this.Right, this.Bottom);
+			}
+		}
+
+		// Methods.
+		public Rectf(float x, float y, float width, float height) {
+			this.X = x;
+			this.Y = y;
+			this.Width = width;
+			this.Height = height;
 		}
 	}
 }

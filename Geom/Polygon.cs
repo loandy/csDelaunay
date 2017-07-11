@@ -1,41 +1,47 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace csDelaunay {
 	public class Polygon {
+		// Properties.
+		public List<Vector2f> Vertices { get; set; }
 
-		private List<Vector2f> vertices;
+		public float Area {
+			get {
+				return Math.Abs(SignedDoubleArea() * 0.5f);
+			}
+		}
 
+		public Winding PolyWinding {
+			get {
+				float signedDoubleArea = SignedDoubleArea();
+				if (signedDoubleArea < 0) {
+					return Winding.CLOCKWISE;
+				}
+				if (signedDoubleArea > 0) {
+					return Winding.COUNTERCLOCKWISE;
+				}
+				return Winding.NONE;
+			}
+		}
+
+		// Methods.
 		public Polygon(List<Vector2f> vertices) {
-			this.vertices = vertices;
-		}
-
-		public float Area() {
-			return Math.Abs(SignedDoubleArea() * 0.5f);
-		}
-
-		public Winding PolyWinding() {
-			float signedDoubleArea = SignedDoubleArea();
-			if (signedDoubleArea < 0) {
-				return Winding.CLOCKWISE;
-			}
-			if (signedDoubleArea > 0) {
-				return Winding.COUNTERCLOCKWISE;
-			}
-			return Winding.NONE;
+			this.Vertices = vertices;
 		}
 
 		private float SignedDoubleArea() {
 			int index, nextIndex;
-			int n = vertices.Count;
+			int n = this.Vertices.Count;
 			Vector2f point, next;
 			float signedDoubleArea = 0;
 
 			for (index = 0; index < n; index++) {
 				nextIndex = (index+1) % n;
-				point = vertices[index];
-				next = vertices[nextIndex];
+				point = this.Vertices[index];
+				next = this.Vertices[nextIndex];
 				signedDoubleArea += point.x * next.y - next.x * point.y;
 			}
 
